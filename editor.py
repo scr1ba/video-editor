@@ -2,7 +2,11 @@ import cv2
 from pytesseract import pytesseract
 from concurrent.futures import ThreadPoolExecutor
 
+margin = 10  # Amount of pixels as margin around the text
+rectangle_color = (0, 0, 255)  # Red color in BGR
+
 def preprocess_image(image):
+    # Convert the image to grayscale
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
     ret, thresh1 = cv2.threshold(gray, 0, 255, cv2.THRESH_OTSU | cv2.THRESH_BINARY_INV)
@@ -11,13 +15,16 @@ def preprocess_image(image):
 def process_frame(frame, frame_number):
     preprocessed = preprocess_image(frame)
 
+    # Use OCR to recognize text in the frame
     data = pytesseract.image_to_data(preprocessed, output_type=pytesseract.Output.DICT)
 
     # Draw a rectangle around recognized text
     for i in range(len(data['text'])):
         if 'Project' in data['text'][i]:
             x, y, w, h = data['left'][i], data['top'][i], data['width'][i], data['height'][i]
-            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+            # Add a margin to the rectangle
+            cv2.rectangle(frame, (x - margin, y - margin), (x + w + margin, y + h + margin), rectangle_color, 2)
+            # Save the frame as an image file for debugging
             cv2.imwrite(f'debug/frame_{frame_number}.png', frame)
 
     return frame
