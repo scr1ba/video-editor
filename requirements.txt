@@ -1,2 +1,2 @@
-oppencv-python
+opencv-python
 pytesseract
