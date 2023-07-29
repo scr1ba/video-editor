@@ -1,0 +1,2 @@
+oppencv-python
+pytesseract
